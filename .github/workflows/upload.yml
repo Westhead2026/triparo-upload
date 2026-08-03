@@ -1,0 +1,34 @@
+name: Upload to App Store Connect
+
+on:
+  workflow_dispatch:
+
+jobs:
+  upload:
+    runs-on: macos-latest
+    steps:
+      - name: Download the signed IPA
+        run: curl -L -o app.ipa "https://github.com/Westhead2026/triparo-upload/releases/download/v1.0.0/ios-2.130297.1.ipa"
+
+      - name: Write API key and config
+        run: |
+          mkdir -p ~/.appstoreconnect/private_keys
+          echo "${{ secrets.APPSTORE_API_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APPSTORE_KEY_ID }}.p8
+          cat > key.json <<EOF
+          {
+            "key_id": "${{ secrets.APPSTORE_KEY_ID }}",
+            "issuer_id": "${{ secrets.APPSTORE_ISSUER_ID }}",
+            "key_filepath": "$HOME/.appstoreconnect/private_keys/AuthKey_${{ secrets.APPSTORE_KEY_ID }}.p8",
+            "in_house": false
+          }
+          EOF
+
+      - name: Install fastlane
+        run: gem install fastlane
+
+      - name: Upload IPA to App Store Connect
+        run: |
+          fastlane pilot upload \
+            --ipa app.ipa \
+            --api_key_path key.json \
+            --skip_waiting_for_build_processing
