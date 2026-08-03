@@ -10,21 +10,16 @@ jobs:
       - name: Download the signed IPA
         run: curl -L -o app.ipa "https://github.com/Westhead2026/triparo-upload/releases/download/v1.0.0/ios-2.130297.1.ipa"
 
-      - name: Write API key and config
-        run: |
-          mkdir -p ~/.appstoreconnect/private_keys
-          echo "${{ secrets.APPSTORE_API_KEY }}" > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.APPSTORE_KEY_ID }}.p8
-          cat > key.json <<EOF
-          {
-            "key_id": "${{ secrets.APPSTORE_KEY_ID }}",
-            "issuer_id": "${{ secrets.APPSTORE_ISSUER_ID }}",
-            "key_filepath": "$HOME/.appstoreconnect/private_keys/AuthKey_${{ secrets.APPSTORE_KEY_ID }}.p8",
-            "in_house": false
-          }
-          EOF
-
       - name: Install fastlane
         run: gem install fastlane
+
+      - name: Create API key JSON
+        run: |
+          printf '{\n  "key_id": "%s",\n  "issuer_id": "%s",\n  "key": "%s",\n  "in_house": false\n}' \
+            "${{ secrets.APPSTORE_KEY_ID }}" \
+            "${{ secrets.APPSTORE_ISSUER_ID }}" \
+            "${{ secrets.APPSTORE_API_KEY }}" > key.json
+          cat key.json
 
       - name: Upload IPA to App Store Connect
         run: |
