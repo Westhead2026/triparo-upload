@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Download the signed IPA
         run: |
-          curl -L -o app.ipa "https://github.com/Westhead2026/triparo-upload/releases/download/v1.0.1/ios-2.131675.11.ipa"
+          curl -L -o app.ipa "https://github.com/Westhead2026/triparo-upload/releases/download/v1.0.1/ios-2.131675.12.ipa"
           ls -lh app.ipa
           file app.ipa
 
